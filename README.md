@@ -1,6 +1,6 @@
 # Quant Finance Backtester (SMA + Options + Monte Carlo)
 
-A compact backtesting & quant learning project for students and interns.  
+A compact backtesting & quant learning project.  
 Built with Python (pandas, numpy, matplotlib), it runs a moving-average crossover strategy on daily data and includes a Black–Scholes options pricer, GBM Monte Carlo simulator, and correlation analysis.
 
 ## ✨ Features
