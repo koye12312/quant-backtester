@@ -1,10 +1,23 @@
-## .gitignore
-
-```gitignore
+# Python
 __pycache__/
-*.pyc
-.venv/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.mypy_cache/
 .ipynb_checkpoints/
-.DS_Store
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Generated artefacts
 data/*.csv
-```
+plots/
+*.png
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
