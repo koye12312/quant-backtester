@@ -4,6 +4,9 @@ A compact, readable Python project for learning the mechanics of systematic
 trading. It runs a **moving-average crossover** backtest on daily equity data
 and ships with three extras — a **Black–Scholes** option pricer, a **Monte
 Carlo** GBM simulator, and a **correlation** analyser for a basket of tickers.
+=======
+A compact backtesting & quant learning project.  
+Built with Python (pandas, numpy, matplotlib), it runs a moving-average crossover strategy on daily data and includes a Black–Scholes options pricer, GBM Monte Carlo simulator, and correlation analysis.
 
 Built with `pandas`, `numpy`, `matplotlib`, `scipy`, and `yfinance`.
 
