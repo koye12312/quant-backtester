@@ -77,7 +77,7 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-Requires Python 3.9+.
+Requires Python 3.10+.
 
 ---
 
@@ -163,7 +163,7 @@ print(est_prob_final_ge_k(paths, K=110))
 
 ## Tested
 
-`pytest` runs 51 tests on every push (see the badge above). They run offline on synthetic data:
+`pytest` runs 51 tests on every push, on Python 3.10 and 3.13 (see the badge above). They run offline on synthetic data:
 
 - **Black–Scholes** reproduces Hull's textbook example (call 4.76, put 0.81), satisfies put–call parity to 1e-10, and every Greek matches a finite-difference estimate to within 0.01%.
 - **Monte Carlo** estimates of E[S_T] and P(S_T ≥ K) land within four standard errors of the exact closed-form values.
