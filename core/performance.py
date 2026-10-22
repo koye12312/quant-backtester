@@ -14,10 +14,19 @@ PLOTS_DIR = Path(__file__).resolve().parent.parent / "plots"
 # Metrics
 # --------------------------------------------------------------------------- #
 def compute_cagr(equity: pd.Series, periods_per_year: int = 252) -> float:
-    if equity.empty:
+    """Compound annual growth rate.
+
+    With a date index, the holding period is measured in calendar time
+    (365.25 days a year). Otherwise it's the number of *intervals* between
+    rows (N rows span N - 1 periods) divided by ``periods_per_year``.
+    """
+    if len(equity) < 2:
         return 0.0
     total_return = equity.iloc[-1] / equity.iloc[0] - 1.0
-    years = len(equity) / periods_per_year
+    if isinstance(equity.index, pd.DatetimeIndex):
+        years = (equity.index[-1] - equity.index[0]).days / 365.25
+    else:
+        years = (len(equity) - 1) / periods_per_year
     if years <= 0:
         return 0.0
     return float((1.0 + total_return) ** (1.0 / years) - 1.0)
@@ -36,7 +45,9 @@ def compute_sharpe_ratio(
     risk_free_rate_annual: float = 0.0,
     periods_per_year: int = 252,
 ) -> float:
-    if returns.empty or returns.std() == 0:
+    # Compare against a tolerance, not exact zero: floating-point noise makes the
+    # std of a constant series ~1e-19, which would give a Sharpe of ~1e16.
+    if returns.empty or returns.std() < 1e-12:
         return 0.0
     excess = returns - (risk_free_rate_annual / periods_per_year)
     return float(np.sqrt(periods_per_year) * excess.mean() / excess.std())
@@ -47,16 +58,23 @@ def compute_sortino_ratio(
     risk_free_rate_annual: float = 0.0,
     periods_per_year: int = 252,
 ) -> float:
-    """Sortino uses only downside deviation in the denominator."""
+    """Annualised Sortino ratio.
+
+    The denominator is the downside deviation: the root-mean-square of the
+    below-target returns, averaged over *all* periods (days above the target
+    count as zero). Taking the standard deviation of only the losing days
+    instead measures how spread out the losses are around their own mean,
+    not how far below zero they fall, and isn't the standard definition.
+    """
     if returns.empty:
         return 0.0
     excess = returns - (risk_free_rate_annual / periods_per_year)
-    downside = excess[excess < 0]
-    if downside.empty or downside.std() == 0:
+    downside_dev = float(np.sqrt((np.minimum(excess, 0.0) ** 2).mean()))
+    if downside_dev < 1e-12:
         return 0.0
     return float(
         (excess.mean() * periods_per_year)
-        / (downside.std() * np.sqrt(periods_per_year))
+        / (downside_dev * np.sqrt(periods_per_year))
     )
 
 

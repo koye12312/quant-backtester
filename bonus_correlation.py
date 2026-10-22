@@ -1,5 +1,6 @@
 """Return-correlation matrix and heatmap across every CSV in data/."""
 from pathlib import Path
+from typing import Optional
 
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -23,7 +24,7 @@ def build_return_frame() -> pd.DataFrame:
     return pd.DataFrame(returns).dropna(how="any")
 
 
-def plot_correlation_heatmap(corr: pd.DataFrame, save_path: Path | None = None, show: bool = True) -> None:
+def plot_correlation_heatmap(corr: pd.DataFrame, save_path: Optional[Path] = None, show: bool = True) -> None:
     fig, ax = plt.subplots(figsize=(7, 6))
     im = ax.imshow(corr, interpolation="nearest", cmap="coolwarm", vmin=-1, vmax=1)
     ax.set_xticks(range(len(corr.columns)))
