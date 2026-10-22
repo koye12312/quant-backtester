@@ -1,12 +1,11 @@
 # Quant Backtester
 
+[![Tests](https://github.com/koye12312/quant-backtester/actions/workflows/tests.yml/badge.svg)](https://github.com/koye12312/quant-backtester/actions/workflows/tests.yml)
+
 A compact, readable Python project for learning the mechanics of systematic
 trading. It runs a **moving-average crossover** backtest on daily equity data
 and ships with three extras — a **Black–Scholes** option pricer, a **Monte
 Carlo** GBM simulator, and a **correlation** analyser for a basket of tickers.
-=======
-A compact backtesting & quant learning project.  
-Built with Python (pandas, numpy, matplotlib), it runs a moving-average crossover strategy on daily data and includes a Black–Scholes options pricer, GBM Monte Carlo simulator, and correlation analysis.
 
 Built with `pandas`, `numpy`, `matplotlib`, `scipy`, and `yfinance`.
 
@@ -50,6 +49,7 @@ quant-backtester/
 │   ├── ma_strategy.py        # SMA crossover signal generation
 │   ├── portfolio_manager.py  # Position → strategy returns → equity curve
 │   └── performance.py        # Metrics + plotting helpers
+├── tests/                    # pytest suite (run with `pytest`)
 ├── data/                     # (generated) Date,Close CSVs
 ├── plots/                    # (generated) PNG output
 ├── requirements.txt
@@ -161,6 +161,23 @@ print(est_prob_final_ge_k(paths, K=110))
 
 ---
 
+## Tested
+
+`pytest` runs 51 tests on every push (see the badge above). They run offline on synthetic data:
+
+- **Black–Scholes** reproduces Hull's textbook example (call 4.76, put 0.81), satisfies put–call parity to 1e-10, and every Greek matches a finite-difference estimate to within 0.01%.
+- **Monte Carlo** estimates of E[S_T] and P(S_T ≥ K) land within four standard errors of the exact closed-form values.
+- **No look-ahead:** rewriting every price after day *k* leaves the strategy's returns up to day *k* unchanged.
+- **Costs** are charged on each position change and never improve results; an always-invested strategy matches buy-and-hold.
+- **Metrics** match hand calculations, including edge cases (no volatility, no losing days).
+
+```bash
+pip install pytest
+pytest
+```
+
+---
+
 ## Data format
 
 CSVs in `data/` must have exactly two columns:
@@ -172,9 +189,7 @@ Date,Close
 ```
 
 `download_sample_data.py` writes these directly and auto-adjusts for splits and
-dividends. The loader handles yfinance's multi-index column output, so you
-should no longer see the old `could not convert string to float: 'AAPL'`
-error that happened when the ticker leaked into the header row.
+dividends. The loader also handles yfinance's multi-index column output.
 
 ---
 
@@ -191,9 +206,9 @@ This is a simple proportional model; it does not simulate bid/ask spreads or
 market impact.
 
 **Metrics.**
-- **CAGR** — compound annual growth rate, assuming 252 trading days/year.
+- **CAGR** — compound annual growth rate, measured over calendar time between the first and last date.
 - **Sharpe** — annualised; uses daily strategy returns, zero risk-free rate by default.
-- **Sortino** — annualised; denominator uses only negative excess returns.
+- **Sortino** — annualised; denominator is the downside deviation (root-mean-square of below-zero returns across all days).
 - **Max Drawdown** — peak-to-trough decline of the equity curve.
 
 ---
